@@ -84,3 +84,39 @@ def newComment(id):
         new_comment = Comment(blog_id=id, comment=comment, user=current_user)
         new_comment.saveComment()
     return render_template('newComment.html', blog=blog, blog_comments=blogComments, comment_form=comment_form)
+
+@main.route('/delete/<int:id>', methods=['GET', 'POST'])
+@login_required
+def deleteComment(id):
+    comment =Comment.query.get_or_404(id)
+    db.session.delete(comment)
+    db.session.commit()
+    flash('comment succesfully deleted')
+    return redirect (url_for('main.allBlogs'))
+
+
+@main.route('/deleteblog/<int:id>', methods=['GET', 'POST'])
+@login_required
+def deleteBlog(id):
+    blog = Blog.query.get_or_404(id)
+    db.session.delete(blog)
+    db.session.commit()
+    return redirect(url_for('main.allBlogs'))   
+
+
+@main.route('/update/<int:id>', methods=['GET', 'POST'])
+@login_required
+def updateBlog(id):
+    blog = Blog.query.get_or_404(id)
+    form = BlogForm()
+    if form.validate_on_submit():
+        blog.title_blog = form.blogTitle.data
+        blog.description = form.blogDescription.data
+        db.session.add(blog)
+        db.session.commit()
+
+        return redirect(url_for('main.allBlogs'))
+    elif request.method == 'GET':
+        form.blogTitle.data = blog.title_blog
+        form.blogDescription.data = blog.description
+    return render_template('updateBlog.html', form=form)
