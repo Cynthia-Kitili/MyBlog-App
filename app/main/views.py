@@ -72,3 +72,15 @@ def newBlog():
 def allBlogs():
     blogs = Blog.getallBlogs()
     return render_template('blogs.html', blogs=blogs)
+
+@main.route('/comment/new/<int:id>', methods=['GET', 'POST'])
+@login_required
+def newComment(id):
+    blog = Blog.query.filter_by(id = id).all()
+    blogComments = Comment.query.filter_by(blog_id=id).all()
+    comment_form = CommentForm()
+    if comment_form.validate_on_submit():
+        comment = comment_form.comment.data
+        new_comment = Comment(blog_id=id, comment=comment, user=current_user)
+        new_comment.saveComment()
+    return render_template('newComment.html', blog=blog, blog_comments=blogComments, comment_form=comment_form)
