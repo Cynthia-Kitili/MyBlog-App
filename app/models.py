@@ -54,9 +54,9 @@ class Blog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     posted = db.Column(db.DateTime, default=datetime.utcnow)
     title_blog = db.Column(db.String(255), index=True)
-    description = db.Column(db.String(255), index=True)
+    description = db.Column(db.Text, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id',ondelete='CASCADE'), nullable=False)
-    def save_blog(self):
+    def saveBlog(self):
         db.session.add(self)
         db.session.commit()
 
@@ -64,11 +64,11 @@ class Blog(db.Model):
         db.session.delete(self)
         db.session.commit()  
     @classmethod
-    def get_blogs(cls, id):
+    def getBlogs(cls, id):
         blogs = Blog.query.filter_by(id=id).all()
         return blogs
     @classmethod
-    def get_all_blogs(cls):
+    def getallBlogs(cls):
         blogs = Blog.query.all()
         return blogs
     

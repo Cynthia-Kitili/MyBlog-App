@@ -68,7 +68,6 @@ def newBlog():
 
 @main.route('/blog/allblogs', methods=['GET', 'POST'])
 @login_required
-@login_required
 def allBlogs():
     blogs = Blog.getallBlogs()
     return render_template('blogs.html', blogs=blogs)
@@ -120,3 +119,7 @@ def updateBlog(id):
         form.blogTitle.data = blog.title_blog
         form.blogDescription.data = blog.description
     return render_template('updateBlog.html', form=form)
+
+@main.route('/about')
+def about():
+    return render_template('about.html', title = 'About')    

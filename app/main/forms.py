@@ -5,7 +5,7 @@ from ..models import User
 from wtforms import ValidationError
     
     
-class UpdateProfile(FlaskForm):
+class updateProfile(FlaskForm):
     bio = TextAreaField('Tell us about you.',validators = [Required()])
     submit = SubmitField('Submit')
 
