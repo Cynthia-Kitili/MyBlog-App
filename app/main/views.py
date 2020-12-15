@@ -3,8 +3,9 @@ from . import main
 from .. import db,photos
 from flask_login import login_user,logout_user,login_required,current_user
 from ..requests import getQuotes
-from .forms import BlogForm,CommentForm,updateProfile
-from ..models import Blog,Comment,User
+from .forms import BlogForm,CommentForm,updateProfile,SubscriberForm
+from ..models import Blog,Comment,User,Subscriber
+from ..email import mail_message
 
 @main.route('/',methods = ['GET'])
 def index():
@@ -55,12 +56,17 @@ def update_pic(uname):
 @main.route('/blog/newBlog',methods = ['GET','POST'])
 @login_required
 def newBlog():
+    subscribers = Subscriber.query.all()
     blogForm = BlogForm()
     if blogForm.validate_on_submit():
         titleBlog=blogForm.blogTitle.data
         description = blogForm.blogDescription.data
         newBlog = Blog(title_blog=titleBlog, description=description, user= current_user)
         newBlog.saveBlog()
+        for subscriber in subscribers:
+            mail_message("Alert New Blog","email/newBlog",subscriber.email,newBlog=newBlog)
+        return redirect(url_for('main.index'))
+        flash('New Blog Posted')
         return redirect(url_for('main.allBlogs'))
     title = 'New Blog'
     return render_template('newBlog.html', title=title, blog_form=blogForm)
@@ -122,4 +128,21 @@ def updateBlog(id):
 
 @main.route('/about')
 def about():
-    return render_template('about.html', title = 'About')    
+    return render_template('about.html', title = 'About')  
+
+
+@main.route('/subscribe', methods=['GET','POST'])
+def subscriber():
+    getquotes = getQuotes()
+    subscriber_form=SubscriberForm()
+    blog = Blog.query.order_by(Blog.posted.desc()).all()
+    if subscriber_form.validate_on_submit():
+        subscriber= Subscriber(email=subscriber_form.email.data,name = subscriber_form.name.data)
+        db.session.add(subscriber)
+        db.session.commit()
+        mail_message("Welcome to MyBlog","email/subscriber",subscriber.email,subscriber=subscriber)
+        title= "MyBlog"
+        return render_template('index.html',title=title, blog=blog, getquotes = getquotes)
+    subscriber = Blog.query.all()
+    blog = Blog.query.all()
+    return render_template('subscribe.html',subscriber=subscriber,subscriber_form=subscriber_form,blog=blog)  
