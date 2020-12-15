@@ -3,7 +3,7 @@
 [Preston-Too](https://github.com/Preston-Too)
 
 ## Live Link
-* [here] ()
+* [here] (https://myblog-master.herokuapp.com/)
 
 ## Description
  MyBlog is an application that is developed using flask. This is a personal blogging website where you can create and share your opinions and other users can read and comment on them. Also displays random quotes on the site.
